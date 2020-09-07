@@ -6,11 +6,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -40,5 +39,29 @@ public class CmsPageRepositoryTest {
             CmsPage newPage = cmsPageRepository.save(cmsPage);
             System.out.println(newPage);
         }
+    }
+
+    //测试自定义条件查询
+    @Test
+    public void testFindAllByExample(){
+        int page=0;//从0开始
+        int size=10;
+        //分页对象
+        Pageable pageable=PageRequest.of(page,size);
+        //定义查询条件对象
+        CmsPage cmsPage=new CmsPage();
+        //定义查询条件：根据id精准查询，不定义条件匹配器内容
+        //cmsPage.setSiteId("5a751fab6abb5044e0d19ea1");
+        //根据页面别名模糊查询，必须定义条件匹配器
+        cmsPage.setPageAliase("轮播");
+        //条件匹配器
+        ExampleMatcher matcher=ExampleMatcher.matching();
+        //重新赋值添加匹配条件
+        matcher=matcher.withMatcher("pageAliase",ExampleMatcher.GenericPropertyMatchers.contains());
+        //条件实例
+        Example<CmsPage> example=Example.of(cmsPage,matcher);
+        Page<CmsPage> all = cmsPageRepository.findAll(example, pageable);
+        List<CmsPage> content = all.getContent();
+        System.out.println(content);
     }
 }

@@ -7,11 +7,13 @@ import com.xuecheng.manage_cms.service.CmsPageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Created by Administrator on 2020/9/6
  */
+@RequestMapping("/cms/page")
 @RestController
 public class CmsPageController implements CmsPageControllerApi {
 

@@ -6,10 +6,9 @@ import com.xuecheng.framework.model.response.CommonCode;
 import com.xuecheng.framework.model.response.QueryResponseResult;
 import com.xuecheng.framework.model.response.QueryResult;
 import com.xuecheng.manage_cms.dao.CmsPageRepository;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 
@@ -22,28 +21,48 @@ public class CmsPageService {
     private CmsPageRepository repository;
 
     /**
-     * 列表页面分页查询，约定前端页面从1开始
+     * 列表页面分页查询，约定前端页面从1开始，没条件查所有
      */
     public QueryResponseResult findList(@PathVariable("page") int page, @PathVariable("size") int size,
                                         QueryPageRequest request) {
+        if (page <= 0) {//设置默认值
+            page = 1;
+        }
+        if (size <= 0) {
+            size = 10;
+        }
+        page = page - 1;//为了适应mongodb的页面从0开始，将页面减1
+        //分页对象
+        //Pageable pageable=new PageRequest(page,size);//已过时，被下面的代替
+        Pageable pageable = PageRequest.of(page, size);
+        //查询条件
+        CmsPage cmsPage = new CmsPage();
+        //防止查询全部时，没有条件空指针异常
         if (request == null) {
             request = new QueryPageRequest();
         }
-        if(page<=0){//设置默认值
-            page=1;
+        //查询条件：站点ID
+        if (StringUtils.isNotEmpty(request.getSiteId())) {
+            cmsPage.setSiteId(request.getSiteId());
         }
-        if(size<=0){
-            size=10;
+        //查询条件：模板ID
+        if (StringUtils.isNotEmpty(request.getTemplateId())) {
+            cmsPage.setTemplateId(request.getTemplateId());
         }
-        page=page-1;//为了适应mongodb的页面从0开始，将页面减1
-        //分页对象
-        //Pageable pageable=new PageRequest(page,size);//已过时，被下面的代替
-        Pageable pageable=PageRequest.of(page,size);
+        //设置查询条件：模糊查询别名
+        if (StringUtils.isNotEmpty(request.getPagealiase())) {
+            cmsPage.setPageAliase(request.getPagealiase());
+        }
+        //设置匹配器和匹配条件
+        ExampleMatcher matcher = ExampleMatcher.matching().withMatcher("pageAliase",
+                ExampleMatcher.GenericPropertyMatchers.contains());
+        Example<CmsPage> example = Example.of(cmsPage, matcher);
         //分页查询
-        Page<CmsPage> all = repository.findAll(pageable);
-        QueryResult queryResult=new QueryResult<CmsPage>();
+        Page<CmsPage> all = repository.findAll(example, pageable);
+        QueryResult queryResult = new QueryResult<CmsPage>();
         queryResult.setList(all.getContent());
         queryResult.setTotal(all.getTotalElements());
-        return new QueryResponseResult(CommonCode.SUCCESS,queryResult);
+        return new QueryResponseResult(CommonCode.SUCCESS, queryResult);
     }
+
 }
