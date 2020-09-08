@@ -2,15 +2,19 @@ package com.xuecheng.manage_cms.service;
 
 import com.xuecheng.framework.domain.cms.CmsPage;
 import com.xuecheng.framework.domain.cms.request.QueryPageRequest;
+import com.xuecheng.framework.domain.cms.response.CmsPageResult;
 import com.xuecheng.framework.model.response.CommonCode;
 import com.xuecheng.framework.model.response.QueryResponseResult;
 import com.xuecheng.framework.model.response.QueryResult;
+import com.xuecheng.framework.model.response.ResponseResult;
 import com.xuecheng.manage_cms.dao.CmsPageRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
+
+import java.util.Optional;
 
 /**
  * Created by Administrator on 2020/9/6
@@ -50,8 +54,8 @@ public class CmsPageService {
             cmsPage.setTemplateId(request.getTemplateId());
         }
         //设置查询条件：模糊查询别名
-        if (StringUtils.isNotEmpty(request.getPagealiase())) {
-            cmsPage.setPageAliase(request.getPagealiase());
+        if (StringUtils.isNotEmpty(request.getPageAliase())) {
+            cmsPage.setPageAliase(request.getPageAliase());
         }
         //设置匹配器和匹配条件
         ExampleMatcher matcher = ExampleMatcher.matching().withMatcher("pageAliase",
@@ -65,4 +69,55 @@ public class CmsPageService {
         return new QueryResponseResult(CommonCode.SUCCESS, queryResult);
     }
 
+    //新增页面
+    public CmsPageResult add(CmsPage cmsPage) {
+        //校验页面是否存在，根据页面名称、站点Id、页面webpath查询
+        CmsPage existPage = repository.findByPageNameAndSiteIdAndPageWebPath(
+                cmsPage.getPageName(), cmsPage.getSiteId(), cmsPage.getPageWebPath());
+        if (existPage == null) {
+            cmsPage.setPageId(null);//添加页面主键由springdata生成,覆盖前端对象中的pageId
+            existPage = repository.save(cmsPage);
+            return new CmsPageResult(CommonCode.SUCCESS, existPage);
+        }
+        return new CmsPageResult(CommonCode.FAIL, null);
+    }
+
+    //根据ID查询页面
+    public CmsPage getById(String id) {
+        Optional<CmsPage> optional = repository.findById(id);
+        if (optional.isPresent()) {
+            return optional.get();
+        }
+        return null;
+    }
+
+    public CmsPageResult update(String id, CmsPage cmspage) {
+        //查询
+        CmsPage existCmsPage = this.getById(id);
+        if (existCmsPage != null) {
+            //更新
+            existCmsPage.setTemplateId(cmspage.getTemplateId());
+            existCmsPage.setSiteId(cmspage.getSiteId());
+            existCmsPage.setPageAliase(cmspage.getPageAliase());
+            existCmsPage.setPageName(cmspage.getPageName());
+            existCmsPage.setPageWebPath(cmspage.getPageWebPath());
+            existCmsPage.setPagePhysicalPath(cmspage.getPagePhysicalPath());
+            //更新
+            CmsPage save = repository.save(existCmsPage);
+            if (save != null) {
+                return new CmsPageResult(CommonCode.SUCCESS, save);
+            }
+        }
+        //记录不存在和保存失败都返回null
+        return new CmsPageResult(CommonCode.FAIL, null);
+    }
+
+    public ResponseResult delete(String id) {
+        CmsPage exist = this.getById(id);
+        if (exist != null) {
+            repository.delete(exist);
+            return new ResponseResult(CommonCode.SUCCESS);
+        }
+        return new ResponseResult(CommonCode.FAIL);
+    }
 }

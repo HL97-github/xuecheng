@@ -20,7 +20,7 @@ public class QueryPageRequest extends RequestData {
     private String pageName;
     //页面别名
     @ApiModelProperty("页面别名")
-    private String pagealiase;
+    private String pageAliase;
     //模板ID
     @ApiModelProperty("模板ID")
     private String templateId;
