@@ -14,6 +14,7 @@ import org.springframework.context.annotation.ComponentScan;
 //扫描依赖工程接口，不加的话比如swagger配置类会加载不进来，因为当前工程没有依赖该对象，该对象不能自动注入当前spring容器中
 @ComponentScan(basePackages={"com.xuecheng.api"})
 @ComponentScan(basePackages={"com.xuecheng.manage_cms"})//扫描本项目下的所有类，可以不加
+@ComponentScan(basePackages = "com.xuecheng.framework")//扫描common工程下的类，有异常相关类
 public class ManageCmsApplication {
     public static void main(String[] args) {
         SpringApplication.run(ManageCmsApplication.class,args);
