@@ -18,18 +18,19 @@ import org.springframework.web.bind.annotation.*;
 public class CmsPageController implements CmsPageControllerApi {
 
     @Autowired
-    private CmsPageService service;
+    private CmsPageService cmsPageService;
 
     //条件查询页面列表并分页
     @Override
     @GetMapping("/list/{page}/{size}")
     public QueryResponseResult findList(@PathVariable("page") int page, @PathVariable("size") int size, QueryPageRequest request) {
-        QueryResponseResult result = service.findList(page, size, request);
+        QueryResponseResult result = cmsPageService.findList(page, size, request);
         return result;
     }
 
     /**
      * 添加页面信息
+     *
      * @param cmsPage
      * @return
      */
@@ -37,27 +38,33 @@ public class CmsPageController implements CmsPageControllerApi {
     @PostMapping("/add")
     //@requestbody将json字符串转成java对象
     public CmsPageResult add(@RequestBody CmsPage cmsPage) {
-        return service.add(cmsPage);
+        return cmsPageService.add(cmsPage);
     }
 
     //根据ID查询页面信息
     @Override
     @GetMapping("/get/{id}")
     public CmsPage findById(@PathVariable("id") String id) {
-        return service.getById(id);
+        return cmsPageService.getById(id);
     }
 
     //修改页面信息
     @Override
     @PutMapping("/edit/{id}")
-    public CmsPageResult update(@PathVariable("id") String id,@RequestBody CmsPage cmsPage) {
-        return service.update(id,cmsPage);
+    public CmsPageResult update(@PathVariable("id") String id, @RequestBody CmsPage cmsPage) {
+        return cmsPageService.update(id, cmsPage);
     }
 
     //根据id删除页面
     @Override
     @DeleteMapping("/del/{id}")
     public ResponseResult delete(@PathVariable("id") String id) {
-        return service.delete(id);
+        return cmsPageService.delete(id);
+    }
+
+    @Override
+    @PostMapping("/postPage/{pageId}")
+    public ResponseResult post(@PathVariable("pageId") String pageId) {
+        return cmsPageService.postPage(pageId);
     }
 }

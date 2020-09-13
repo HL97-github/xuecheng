@@ -6,6 +6,7 @@
     <modules>
         <module>../xc-service-manage-cms</module>
         <module>../test-freemarker</module>
+        <module>../xc-service-manage-cms-client</module>
     </modules>
     <parent>
         <groupId>org.springframework.boot</groupId>

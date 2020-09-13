@@ -10,14 +10,13 @@ import java.util.List;
 /**
  * Created by admin on 2018/2/6.
  */
+//整个CMS模型的集合类，也是mongodb中的表
 @Data
 @ToString
 @Document(collection = "cms_config")
 public class CmsConfig {
-
     @Id
-    private String id;
-    private String name;
-    private List<CmsConfigModel> model;
-
+    private String id;//主键
+    private String name;//数据模型的名称
+    private List<CmsConfigModel> model;//数据模型项目
 }

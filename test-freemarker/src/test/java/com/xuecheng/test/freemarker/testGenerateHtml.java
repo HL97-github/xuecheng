@@ -25,6 +25,7 @@ import java.util.Map;
 @RunWith(SpringRunner.class)
 public class testGenerateHtml {
 
+
     //基于模板生成静态化文件
     @Test
     public void testCreateHtml() throws IOException, TemplateException {
