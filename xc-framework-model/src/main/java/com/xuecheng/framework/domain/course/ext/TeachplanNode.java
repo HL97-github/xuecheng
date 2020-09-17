@@ -12,7 +12,6 @@ import java.util.List;
 @Data
 @ToString
 public class TeachplanNode extends Teachplan {
-
+    private static final long serialVersionUID = 1229502487193672525L;
     List<TeachplanNode> children;
-
 }
